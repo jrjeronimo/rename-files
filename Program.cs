@@ -1,10 +1,12 @@
+
+
 Console.WriteLine("Root path to rename files and subfolders");
 var rootPath = Console.ReadLine();
 
-Console.WriteLine("Text to replace");
+Console.WriteLine("Text to replace as PascalCase");
 var textToReplace = Console.ReadLine();
 
-Console.WriteLine("Replacement text");
+Console.WriteLine("Replacement text as PascalCase");
 var replacement = Console.ReadLine();
 
 if (string.IsNullOrWhiteSpace(replacement)
@@ -18,7 +20,12 @@ if (string.IsNullOrWhiteSpace(replacement)
 
 var files = Directory.GetFiles(rootPath, $"*{textToReplace}*", SearchOption.AllDirectories);
 
+var replacementCamelCase = char.ToLowerInvariant(replacement[0]) + replacement[1..];
 foreach (var filePath in files)
 {
-    File.Move(filePath, filePath.Replace(textToReplace, replacement));
+    string text = File.ReadAllText(filePath);
+    text = text.Replace(textToReplace, replacement)
+               .Replace(textToReplace, replacementCamelCase, StringComparison.InvariantCultureIgnoreCase);
+    File.WriteAllText(filePath.Replace(textToReplace, replacement), text);
+    File.Delete(filePath);
 }
